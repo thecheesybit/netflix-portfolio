@@ -22,26 +22,28 @@ const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [profilePath, setProfilePath] = useState<string>("/browse");
-  const [profileImage, setProfileImage] = useState(blueImage);
-  const [user, setUser] = useState<{ uid: string; displayName?: string } | null>(null);
+  const [profileImage, setProfileImage] = useState<string>(blueImage);  // Default profile image
+  const [user, setUser] = useState<{ uid: string; displayName?: string; profileImage?: string } | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [showCreditsPopup, setShowCreditsPopup] = useState(false);
 
   useEffect(() => {
     // Load selected profile from localStorage
     const savedProfile = localStorage.getItem("selectedProfile");
-    if (savedProfile) {
-      try {
-        const profileData = JSON.parse(savedProfile);
-        if (profileData?.name) {
-          setProfilePath(`/profile/${profileData.name}`);
-          setProfileImage(profileData.image || blueImage);
+      if (savedProfile) {
+        try {
+          const profileData = JSON.parse(savedProfile);
+          if (profileData?.name) {
+            setProfilePath(`/profile/${profileData.name}`);
+            if (profileData.image) {
+              setProfileImage(profileData.image);  // Set specific profile image/GIF from localStorage
+            }
+          }
+        } catch (error) {
+          console.error("Error parsing profile data from localStorage:", error);
         }
-      } catch (error) {
-        console.error("Error parsing profile data from localStorage:", error);
       }
-    }
-  }, []);
+    }, []);  // Only run once on mount to load from localStorage
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -49,6 +51,7 @@ const Navbar: React.FC = () => {
         setUser({
           uid: currentUser.uid,
           displayName: currentUser.displayName ?? "User",
+          profileImage: profileImage,  // Ensure profile image persists even after login
         });
 
         // Fetch credits from Firestore
@@ -67,7 +70,7 @@ const Navbar: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [auth, db]);
+  }, [auth, db, profileImage]);  // Pass profileImage to keep it updated
 
   const handleProfileClick = () => {
     navigate(profilePath);
@@ -122,7 +125,7 @@ const Navbar: React.FC = () => {
         <div className="navbar-right">
           {/* Show Credits Icon for Desktop */}
           {user && (
-            <div 
+            <div
               className="credits-container"
               onMouseEnter={() => setShowCreditsPopup(true)}
               onMouseLeave={() => setShowCreditsPopup(false)}
@@ -144,7 +147,7 @@ const Navbar: React.FC = () => {
           </div>
 
           <img
-            src={profileImage}
+            src={user?.profileImage || profileImage}  // Show user-specific image or default
             alt="Profile"
             className="profile-icon"
             onClick={() => navigate("/browse")}

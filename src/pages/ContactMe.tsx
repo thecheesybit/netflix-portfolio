@@ -1,7 +1,7 @@
 import React from 'react';
 import './ContactMe.css';
 import profilePic from '../images/ayush.webp'; // Image import for Ayush Kumar
-import { FaEnvelope, FaPhoneAlt, FaCoffee, FaLinkedin } from 'react-icons/fa';
+import { FaEnvelope, FaPhoneAlt, FaCoffee, FaLinkedin, FaGithub } from 'react-icons/fa';
 import { ContactMe as IContactMe } from '../types';
 
 const contactData: IContactMe = {
@@ -33,6 +33,14 @@ const ContactMe: React.FC = () => {
             className="badge-link"
           >
             <FaLinkedin className="linkedin-icon" /> View Profile
+          </a>
+          <a
+            href="https://github.com/thecheesybit"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="badge-link"
+          >
+            <FaGithub className="github-icon" /> View Profile
           </a>
         </div>
       </div>

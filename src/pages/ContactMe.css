@@ -6,7 +6,7 @@
   animation: fadeIn 0.8s ease-in-out;
 }
 
-.linkedin-badge-custom {
+.linkedin-badge-custom, .github-badge-custom {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +73,7 @@
   background-color: #005983;
 }
 
-.linkedin-icon {
+.linkedin-icon, .github-icon {
   margin-right: 5px;
 }
 
@@ -150,4 +150,17 @@
   50% {
     transform: rotate(30deg);
   }
+}
+
+/* GitHub Badge */
+.github-badge-custom {
+  background: #333;
+}
+
+.github-badge-custom .badge-link {
+  background-color: #333;
+}
+
+.github-badge-custom .badge-link:hover {
+  background-color: #6e5494;
 }

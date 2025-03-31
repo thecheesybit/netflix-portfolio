@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-} from "firebase/auth";
-import {  doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import ProfileCard from "../components/ProfileCard";
 import blueImage from "../images/2.webp";
 import greyImage from "../images/1.webp";
@@ -13,6 +9,7 @@ import redImage from "../images/3.webp";
 import addProfile from "../images/addProfile.webp";
 import yellowImage from "../images/4.webp";
 import Ayush from "../images/ak-logo-2.webp";
+// import deafultGif from "../images/default.gif"
 import "./browse.css";
 
 // Initialize Firebase
@@ -89,11 +86,12 @@ const Browse: React.FC = () => {
         console.error("Google login failed", error);
       }
     } else {
-      localStorage.setItem("selectedProfile", JSON.stringify(profile));
+      const backgroundGif = profile.backgroundGif || "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExOGlrMTU4MW51MXZhMnl1ajRsMjQybzd2OXVwMWg5ZTFyc2Z4N3VnbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l4JySAWfMaY7w88sU/giphy.gif"; // Default for Google users
+      localStorage.setItem("selectedProfile", JSON.stringify(profile));  // Store selected profile
       navigate(`/profile/${profile.name}`, {
         state: {
           profileImage: profile.image,
-          backgroundGif: profile.backgroundGif,
+          backgroundGif: backgroundGif,
         },
       });
     }
@@ -114,7 +112,7 @@ const Browse: React.FC = () => {
     {
       name: "developer",
       image: greyImage,
-      backgroundGif: "https://media.giphy.com/media/tIE1Po4CoWac/giphy.gif",
+      backgroundGif: "https://media.giphy.com/media/Px7FQJqhWTGaA/giphy.gif?cid=ecf05e47eqienrmd5819lntubnqk0yzc3jdt2j1crekwb2fq&ep=v1_gifs_related&rid=giphy.gif&ct=g",
     },
     {
       name: "stalker",
