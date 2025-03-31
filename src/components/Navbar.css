@@ -61,6 +61,48 @@
   cursor: pointer;
 }
 
+/* Credits Container (Desktop only) */
+.credits-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+/* Netflix Red Credits Icon */
+.credits-icon {
+  font-size: 22px;
+  color: #e50914; /* Netflix Red */
+  transition: transform 0.3s ease-in-out;
+}
+
+.credits-container:hover .credits-icon {
+  transform: scale(1.2);
+}
+
+/* Credits Popup */
+.credits-popup {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.credits-container:hover .credits-popup {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* Hide the hamburger and sidebar in desktop view */
 .hamburger,
 .sidebar-overlay,
@@ -74,14 +116,19 @@
     height: 20px;
     margin-right: auto;
   }
+
   .profile-icon {
     width: 24px;
     height: 24px;
   }
 
-
   /* Hide Navbar Links in Mobile */
   .navbar-links {
+    display: none;
+  }
+
+  /* Remove Credits from Navbar in Mobile */
+  .credits-container {
     display: none;
   }
 
@@ -126,8 +173,7 @@
     color: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* Space out logo, content, and footer */
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     z-index: 4;
@@ -137,27 +183,54 @@
     transform: translateX(0);
   }
 
+  /* Update for Logo Padding */
   .sidebar-logo img {
-    height: 30px;
+    height: 35px;
+    margin-top: 40px; /* Increase the padding from top */
     margin-bottom: 20px;
   }
 
+  /* Main Content in the middle */
   .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    flex-grow: 1; /* Fill available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center the links vertically */
   }
+
   .sidebar ul li {
     padding: 15px 20px;
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  
+
   .sidebar ul li a {
     color: #fff;
     text-decoration: none;
     font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Footer at the bottom of Sidebar */
+  .sidebar-footer {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    color: #bbb;
+    padding-bottom: 30px; /* Increase the padding from bottom */
+  }
+
+  /* Replace Home with Credits in Sidebar */
+  .sidebar .credits-text {
+    color: #e50914; /* Netflix Red */
+    font-size: 1.2rem;
+    font-weight: bold;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -175,4 +248,66 @@
     align-items: center;
     justify-content: center;
   }
+
+  /* Adjust credits popup in mobile */
+  .credits-popup {
+    bottom: -40px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* Google Login Button Styling */
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  background-color: #282828; /* Google Blue */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  gap: 10px; /* Space between the icon and text */
+}
+
+.google-login-btn:hover {
+  background-color: #737373; /* Darker Google Blue on hover */
+}
+
+.google-logo-img {
+  width: 20px; /* Adjust size of the Google logo */
+  height: auto;
+}
+
+/* Mobile-specific Styling */
+@media (max-width: 768px) {
+  .google-login-btn {
+    padding: 8px 15px;
+    font-size: 0.9rem; /* Smaller font size for mobile */
+  }
+
+  .google-logo-img {
+    width: 18px; /* Smaller logo for mobile */
+  }
+}
+
+/* Google Login Button in Navbar */
+.navbar .google-login {
+  list-style: none;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+/* Footnote for mobile sign-in */
+.sign-in-footnote {
+  font-size: 0.9rem; /* Smaller font size for mobile */
+  color: #bbb; /* Light gray color */
+  text-align: center; /* Centered text */
+  padding: 10px; /* Add some padding */
+  margin-top: 20px; /* Space above the footnote */
+  display: block; /* Make sure it's displayed as a block element */
+  padding-bottom: 30px; /* Increase the padding from bottom */
 }

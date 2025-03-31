@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   onAuthStateChanged,
 } from "firebase/auth";
+import {  doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import ProfileCard from "../components/ProfileCard";
 import blueImage from "../images/2.webp";
 import greyImage from "../images/1.webp";
@@ -15,6 +15,9 @@ import yellowImage from "../images/4.webp";
 import Ayush from "../images/ak-logo-2.webp";
 import "./browse.css";
 
+// Initialize Firebase
+import { auth, db } from "../firebase"; // Ensure Firebase is initialized correctly
+
 interface Profile {
   name: string;
   image: string;
@@ -22,10 +25,8 @@ interface Profile {
   isAddProfile?: boolean;
 }
 
-
 const Browse: React.FC = () => {
   const navigate = useNavigate();
-  const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const [user, setUser] = useState<{ firstName: string; displayName?: string } | null>(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -44,27 +45,51 @@ const Browse: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   const handleProfileClick = async (profile: Profile) => {
     if (profile.isAddProfile) {
       try {
         const result = await signInWithPopup(auth, provider);
-        const firstName = result.user.displayName?.split(" ")[0] || "User";
+        const user = result.user;
+        const firstName = user.displayName?.split(" ")[0] || "User";
+  
         setUser({
           firstName,
-          displayName: result.user.displayName ?? undefined,
+          displayName: user.displayName ?? undefined,
         });
-
+  
         setShowPopup(true);
         setTimeout(() => setShowPopup(false), 2000);
+  
+        // Check if user already has a document
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+  
+        if (!userDoc.exists()) {
+          // If user does not exist, create a new document
+          await setDoc(userDocRef, {
+            firstName,
+            credits: 10,
+            lastUpdated: serverTimestamp(), // Store the timestamp
+          });
+        } else {
+          // If user exists, check if credits need to be refreshed
+          const userData = userDoc.data();
+          const lastUpdated = userData.lastUpdated?.toDate();
+          const today = new Date();
+          if (!lastUpdated || lastUpdated.toDateString() !== today.toDateString()) {
+            await updateDoc(userDocRef, {
+              credits: 10, // Reset to 10 credits
+              lastUpdated: serverTimestamp(),
+            });
+          }
+        }
       } catch (error) {
         console.error("Google login failed", error);
       }
     } else {
-      // Store full profile object in localStorage
       localStorage.setItem("selectedProfile", JSON.stringify(profile));
-
       navigate(`/profile/${profile.name}`, {
         state: {
           profileImage: profile.image,

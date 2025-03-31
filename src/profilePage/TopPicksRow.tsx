@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import './TopPicksRow.css';
-import { FaPassport, FaCode, FaBriefcase, FaCertificate, FaHandsHelping, FaProjectDiagram, FaEnvelope, FaMusic, FaBook } from 'react-icons/fa';
+import { FaPassport, FaCode, FaBriefcase, FaCertificate, FaHandsHelping, FaProjectDiagram, FaEnvelope, FaMusic } from 'react-icons/fa';
 
 type ProfileType = 'recruiter' | 'developer' | 'stalker' | 'user';
 
@@ -50,12 +50,12 @@ const TopPicksRow: React.FC<TopPicksRowProps> = ({ profile }) => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName || "User"); // Default to "User" if no name is found
+        setUserName(user.displayName || profile.charAt(0).toUpperCase() + profile.slice(1)); 
       } else {
-        setUserName("User");
+        setUserName(profile.charAt(0).toUpperCase() + profile.slice(1));
       }
     });
-  }, []);
+  }, [profile]);
 
   const topPicks = topPicksConfig[profile] || topPicksConfig['user'];
 

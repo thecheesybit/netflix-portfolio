@@ -41,12 +41,13 @@ const ContinueWatching: React.FC<ContinueWatchingProps> = ({ profile }) => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserName(user.displayName || "User"); // Default to "User" if no name is found
+        setUserName(user.displayName || profile.charAt(0).toUpperCase() + profile.slice(1)); 
       } else {
-        setUserName("User");
+        setUserName(profile.charAt(0).toUpperCase() + profile.slice(1));
       }
     });
-  }, []);
+  }, [profile]);
+  
 
   const continueWatching = continueWatchingConfig[profile] || continueWatchingConfig['user'];
 
