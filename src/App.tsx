@@ -15,6 +15,7 @@ import Reading from './pages/Reading';
 import Blogs from './pages/Blogs';
 import Certifications from './pages/Certifications';
 import ManageProfile from './pages/ManageProfile';
+import Stream from './projects/streaming/stream';  // Import Stream component
 
 const App: React.FC = () => {
   return (
@@ -33,6 +34,9 @@ const App: React.FC = () => {
       <Route path="/reading" element={<Layout><Reading /></Layout>} />
       <Route path="/blogs" element={<Layout><Blogs /></Layout>} />
       <Route path="/certifications" element={<Layout><Certifications /></Layout>} />
+      
+      {/* Add dynamic route for streaming */}
+      <Route path="/stream/:videoName" element={<Stream />} />
     </Routes>
   );
 };

@@ -1,0 +1,77 @@
+/* General Netflix-like aesthetic */
+.netflix-stream-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #141414;
+    padding: 20px;
+    min-height: 100vh;
+    justify-content: center;
+  }
+  
+  .intro-screen {
+    text-align: center;
+    color: white;
+    font-family: "Arial", sans-serif;
+  }
+  
+  .intro-screen h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .intro-screen h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  
+  .intro-screen p {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+  
+  .quality-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .quality-buttons button {
+    background: linear-gradient(135deg, #e50914, #db0707);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .quality-buttons button:hover {
+    background: linear-gradient(135deg, #db0707, #e50914);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  }
+  
+  .quality-buttons button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Video player styling */
+  .video-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .video-js {
+    width: 100%;
+    height: 600px;
+    border-radius: 10px;
+    background-color: black;
+  }
+  
