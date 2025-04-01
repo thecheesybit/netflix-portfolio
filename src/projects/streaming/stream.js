@@ -2,14 +2,32 @@ import React, { useRef, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import "./stream.css"; // Netflix-style theme
+import "./stream.css";
 import "videojs-hotkeys";
-import videoSources from "../../videoSources"; // Import the video sources
+import videoSources from "../../videoSources";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, updateDoc, setDoc, Timestamp } from "firebase/firestore";
 
+// Simple XOR encryption with a key
+const encryptVideoUrl = (url, key = "xai-stream-key") => {
+  let encrypted = '';
+  for (let i = 0; i < url.length; i++) {
+    encrypted += String.fromCharCode(url.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  }
+  return btoa(encrypted);
+};
+
+const decryptVideoUrl = (encrypted, key = "xai-stream-key") => {
+  const decoded = atob(encrypted);
+  let decrypted = '';
+  for (let i = 0; i < decoded.length; i++) {
+    decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+  }
+  return decrypted;
+};
+
 const Stream = () => {
-  const { videoName } = useParams(); // Get the video name from the URL
+  const { videoName } = useParams();
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const [currentSource, setCurrentSource] = useState(null);
@@ -20,14 +38,44 @@ const Stream = () => {
   const [timeLeft, setTimeLeft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastWatchedTime, setLastWatchedTime] = useState(null);
-  const [showPopup, setShowPopup] = useState(false); // Popup state
+  const [showPopup, setShowPopup] = useState(null);
+  const [showRefresh, setShowRefresh] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth();
   const db = getFirestore();
 
-  const COST = 4; // Cost to watch this movie
+  const COST = 4;
 
-  // Check if the video name is valid
+  useEffect(() => {
+    const lockOrientation = async () => {
+      if ('screen' in window && 'orientation' in window.screen && 'lock' in window.screen.orientation) {
+        try {
+          await window.screen.orientation.lock('landscape');
+        } catch (err) {
+          console.log('Orientation lock failed:', err);
+        }
+      }
+    };
+
+    const unlockOrientation = async () => {
+      if ('screen' in window && 'orientation' in window.screen && 'unlock' in window.screen.orientation) {
+        try {
+          await window.screen.orientation.unlock();
+        } catch (err) {
+          console.log('Orientation unlock failed:', err);
+        }
+      }
+    };
+
+    if (isQualitySelected) {
+      lockOrientation();
+    }
+
+    return () => {
+      unlockOrientation();
+    };
+  }, [isQualitySelected]);
+
   useEffect(() => {
     if (!videoSources[videoName]) {
       setValidVideo(false);
@@ -36,14 +84,11 @@ const Stream = () => {
     setValidVideo(true);
   }, [videoName]);
 
-  // Handle Google Authentication and fetch user's credits and last watched time
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // If not logged in, redirect to the homepage
         navigate("/");
       } else {
-        // Fetch user credits, lastUpdated, and last watched time from Firestore
         const userDocRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userDocRef);
         
@@ -58,11 +103,8 @@ const Stream = () => {
           setCredits(data.credits);
           setLastUpdated(lastUpdatedTimestamp);
           setLastWatchedTime(lastWatchedTimestamp);
-          setTimeLeft(timeDiff < 86400 ? 86400 - timeDiff : 0); // 86400 seconds = 24 hours
-          setTimeLeft(timeSinceLastWatched ? 86400 - timeSinceLastWatched : 0); // Time left since the last watch
-
+          setTimeLeft(timeSinceLastWatched ? 86400 - timeSinceLastWatched : timeDiff < 86400 ? 86400 - timeDiff : 0);
         } else {
-          // If no user data, create a new document with default credits (10)
           await setDoc(userDocRef, {
             credits: 10,
             lastUpdated: Timestamp.now(),
@@ -78,58 +120,52 @@ const Stream = () => {
     return () => unsubscribe();
   }, [auth, db, navigate, videoName]);
 
-  // Handle quality selection and credit deduction
-  const handleQualitySelection = async (quality) => {
+  const handleQualitySelection = (quality) => {
     const user = auth.currentUser;
     if (user) {
-      const userDocRef = doc(db, "users", user.uid);
-
       if (lastWatchedTime && timeLeft > 0) {
-        // User has watched this movie in the last 24 hours and doesn't need to pay again
-        alert(`Continue watching this movie. Time left for Auto Renewal of credits: ${Math.floor(timeLeft / 3600)} hours.`);
         setCurrentSource(quality);
         setIsQualitySelected(true);
         return;
       }
 
-      // Check if user has enough credits
       if (credits < COST) {
-        // If credits are insufficient, show the time left to recharge
-        alert(`You need ${COST} credits to watch this video. Please wait for auto renewal to happen.`);
+        setShowPopup("credits");
         return;
       }
 
-      // Trigger the popup to confirm purchase
-      setShowPopup(true); // Show confirmation popup
+      setShowPopup("purchase");
+      setCurrentSource(quality);
     }
-
-    setCurrentSource(quality);
-    setIsQualitySelected(true);
   };
 
-  // Handle the actual purchase
   const handlePurchase = async () => {
     const user = auth.currentUser;
-    if (user) {
+    if (user && currentSource) {
       const userDocRef = doc(db, "users", user.uid);
-
-      // Deduct 4 credits as the user has sufficient credits
-      setLoading(true); // Show loading spinner
+      setLoading(true);
       await updateDoc(userDocRef, {
         credits: credits - COST,
         lastUpdated: Timestamp.now(),
-        [`lastWatched.${videoName}`]: Timestamp.now(), // Save the time of last watched for this specific movie
+        [`lastWatched.${videoName}`]: Timestamp.now(),
       });
 
-      setCredits(credits - COST); // Update state
-      setLoading(false); // Hide loading spinner
-      setShowPopup(false); // Close the popup
+      setCredits(credits - COST);
+      setLastWatchedTime(new Date());
+      setTimeLeft(86400);
+      setLoading(false);
+      setShowPopup(null);
+      setIsQualitySelected(true);
     }
   };
 
-  // Initialize video.js player when quality is selected
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   useEffect(() => {
-    if (validVideo && currentSource) {
+    let errorTimer;
+    if (validVideo && currentSource && isQualitySelected) {
       if (!playerRef.current) {
         playerRef.current = videojs(videoRef.current, {
           controls: true,
@@ -137,9 +173,18 @@ const Stream = () => {
           preload: "auto",
           fluid: true,
           responsive: true,
+          inactivityTimeout: 5000, // Set timeout to 5 seconds
           controlBar: {
-            volumePanel: { inline: false },
+            volumePanel: { inline: false, vertical: true },
             pictureInPictureToggle: false,
+            children: [
+              'playToggle',
+              'volumePanel',
+              'currentTimeDisplay',
+              'progressControl',
+              'remainingTimeDisplay',
+              'fullscreenToggle'
+            ]
           },
           plugins: {
             hotkeys: {
@@ -149,85 +194,166 @@ const Stream = () => {
             },
           },
         });
+
+        const player = playerRef.current;
+
+        // Add video title above progress bar
+        const titleElement = document.createElement('div');
+        titleElement.className = 'vjs-video-title';
+        titleElement.innerText = videoName;
+        player.el().insertBefore(titleElement, player.controlBar.el());
+
+        // Add rewind button manually
+        const rewindButton = player.controlBar.addChild('Button', {
+          className: 'vjs-rewind-button',
+          controlText: 'Rewind 10s'
+        });
+        rewindButton.el().innerHTML = '<span>-10</span>';
+        rewindButton.on('click', () => {
+          const currentTime = player.currentTime();
+          player.currentTime(Math.max(0, currentTime - 10));
+        });
+        player.controlBar.el().insertBefore(rewindButton.el(), player.controlBar.getChild('volumePanel').el());
+
+        // Add forward button manually
+        const forwardButton = player.controlBar.addChild('Button', {
+          className: 'vjs-forward-button',
+          controlText: 'Forward 10s'
+        });
+        forwardButton.el().innerHTML = '<span>+10</span>';
+        forwardButton.on('click', () => {
+          const currentTime = player.currentTime();
+          const duration = player.duration();
+          player.currentTime(Math.min(duration, currentTime + 10));
+        });
+        player.controlBar.el().insertBefore(forwardButton.el(), player.controlBar.getChild('fullscreenToggle').el());
+
+        // Prevent right-click
+        player.el().addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+        });
+
+        // Touch controls
+        const videoEl = player.el().querySelector('.vjs-tech');
+        videoEl.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const rect = videoEl.getBoundingClientRect();
+          const touchX = touch.clientX - rect.left;
+          const halfWidth = rect.width / 2;
+
+          if (touchX < halfWidth) {
+            player.currentTime(Math.max(0, player.currentTime() - 10));
+          } else {
+            player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
+          }
+        });
+
+        let tapTimer;
+        videoEl.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          clearTimeout(tapTimer);
+          tapTimer = setTimeout(() => {
+            if (player.paused()) {
+              player.play();
+            } else {
+              player.pause();
+            }
+          }, 200);
+        });
+
+        player.on('error', () => {
+          errorTimer = setTimeout(() => setShowRefresh(true), 10000);
+        });
+
+        player.on('loadedmetadata', () => {
+          clearTimeout(errorTimer);
+          setShowRefresh(false);
+        });
       }
-      playerRef.current.src([{ src: videoSources[videoName][currentSource], type: "video/mp4" }]);
-      playerRef.current.play();
+      
+      const encryptedUrl = encryptVideoUrl(videoSources[videoName][currentSource]);
+      playerRef.current.src([{ src: decryptVideoUrl(encryptedUrl), type: "video/mp4" }]);
+      playerRef.current.play().catch(() => {
+        errorTimer = setTimeout(() => setShowRefresh(true), 10000);
+      });
     }
+    
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;
       }
+      clearTimeout(errorTimer);
     };
-  }, [validVideo, currentSource, videoName]);
+  }, [validVideo, currentSource, isQualitySelected, videoName]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i')) {
+        e.preventDefault();
+      }
+    });
+  }, []);
 
-  if (!validVideo) {
-    return <div>Video not found!</div>;
-  }
+  if (loading) return <div className="loader">Loading...</div>;
+  if (!validVideo) return <div>Video not found!</div>;
 
-  // Render the video quality selection or video player
   return (
     <div className="netflix-stream-container">
       {!isQualitySelected ? (
         <div className="intro-screen">
           <h2>{videoName}</h2>
           {lastWatchedTime && timeLeft > 0 ? (
-            <p>
-              Auto Credit Renewal in next {Math.floor(timeLeft / 3600)} hours.
-            </p>
+            <p>Continue watching without Re-purchase for next {Math.floor(timeLeft / 3600)} hours.</p>
           ) : (
             <p>This movie costs {COST} credits to watch.</p>
           )}
           <p>Your current credits: {credits}</p>
-
-          {/* Hide the 'You don't have enough credits' message if already purchased */}
-          {credits >= COST && !lastWatchedTime && timeLeft <= 0 ? (
-            <p>Choose Quality to watch the movie.</p>
-          ) : lastWatchedTime && timeLeft > 0 ? (
-            <p>
-              Continue watching without Re-purchase for NEXT{" "}
-              {Math.floor(timeLeft / 3600)} HOURS.
-            </p>
-          ) : (
-            <p>
-              You don't have enough credits. Please wait for auto renewal (24hrs Max).
-            </p>
-          )}
-
+          
           <div className="quality-buttons">
-            <button onClick={() => handleQualitySelection("1080p")}>
-              1080p
-            </button>
+            <button onClick={() => handleQualitySelection("1080p")}>1080p</button>
             <button onClick={() => handleQualitySelection("720p")}>720p</button>
             <button onClick={() => handleQualitySelection("480p")}>480p</button>
           </div>
-
-          {/* Display auto recharge time if applicable */}
-          {timeLeft > 0 && !lastWatchedTime && (
-            <p>Auto Credit Renewal in {Math.floor(timeLeft / 3600)} hours.</p>
-          )}
         </div>
       ) : (
-        <div className="video-wrapper">
-          <video ref={videoRef} className="video-js vjs-theme-netflix" />
+        <div className="video-container">
+          <div className="video-wrapper">
+            <video ref={videoRef} className="video-js vjs-theme-netflix" />
+          </div>
+          {showRefresh && (
+            <button className="refresh-button" onClick={handleRefresh}>
+              Refresh Video
+            </button>
+          )}
         </div>
       )}
 
-      {/* Popup Confirmation */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-container">
-            <h3>Confirm Purchase</h3>
-            <p>Are you sure you want to purchase this movie for {COST} credits?</p>
-            <div className="popup-buttons">
-              <button onClick={handlePurchase}>Yes</button>
-              <button onClick={() => setShowPopup(false)}>No</button>
-            </div>
-            <span className="close-popup" onClick={() => setShowPopup(false)}>×</span>
+            {showPopup === "purchase" && (
+              <>
+                <h3>Confirm Purchase</h3>
+                <p>Are you sure you want to purchase this movie for {COST} credits?</p>
+                <div className="popup-buttons">
+                  <button onClick={handlePurchase}>Yes</button>
+                  <button onClick={() => setShowPopup(null)}>No</button>
+                </div>
+              </>
+            )}
+            {showPopup === "credits" && (
+              <>
+                <h3>Insufficient Credits</h3>
+                <p>You need {COST} credits to watch this video. Please wait for auto renewal.</p>
+                <div className="popup-buttons">
+                  <button onClick={() => setShowPopup(null)}>OK</button>
+                </div>
+              </>
+            )}
+            <span className="close-popup" onClick={() => setShowPopup(null)}>×</span>
           </div>
         </div>
       )}

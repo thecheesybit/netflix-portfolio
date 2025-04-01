@@ -3,89 +3,274 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #141414;
-  padding: 20px;
+  background: #000000;
+  padding: 10px;
   min-height: 100vh;
   justify-content: center;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 .intro-screen {
   text-align: center;
   color: white;
-  font-family: "Arial", sans-serif;
-}
-
-.intro-screen h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-family: "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
 }
 
 .intro-screen h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: clamp(20px, 5vw, 28px);
+  margin-bottom: 15px;
+  font-weight: 700;
 }
 
 .intro-screen p {
-  font-size: 18px;
-  margin-bottom: 30px;
+  font-size: clamp(14px, 3vw, 18px);
+  margin-bottom: 20px;
+  color: #d2d2d2;
 }
 
 .quality-buttons {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
+  padding: 10px;
 }
 
 .quality-buttons button {
-  background: linear-gradient(135deg, #e50914, #db0707);
+  background: #e50914;
   color: white;
   border: none;
-  padding: 12px 30px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 700;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  flex: 1;
+  min-width: 80px;
+  max-width: 120px;
 }
 
 .quality-buttons button:hover {
-  background: linear-gradient(135deg, #db0707, #e50914);
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  background: #f40612;
 }
 
 .quality-buttons button:active {
   transform: scale(0.98);
 }
 
-/* Video player styling */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+}
+
 .video-wrapper {
   width: 100%;
-  max-width: 1200px;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  position: relative;
 }
 
 .video-js {
   width: 100%;
-  height: 600px;
-  border-radius: 10px;
+  height: auto;
+  min-height: 200px;
+  border-radius: 8px;
   background-color: black;
 }
 
-/* Styling for Auto Credit Renewal and messages */
-.intro-screen p {
-  font-size: 18px;
-  color: #f5f5f5;
-  margin-bottom: 20px;
+/* Netflix-inspired Video.js theme */
+.vjs-theme-netflix {
+  --vjs-theme-netflix--primary: #e50914;
+  --vjs-theme-netflix--secondary: #ffffff;
+  --vjs-theme-netflix--background: rgba(0, 0, 0, 0.9);
 }
 
-.intro-screen p:last-child {
+.vjs-theme-netflix .vjs-control-bar {
+  background: linear-gradient(to top, var(--vjs-theme-netflix--background), transparent);
+  height: 100px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  transition: opacity 0.5s ease; /* Smooth fade transition */
+  z-index: 1000;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.vjs-theme-netflix.vjs-fullscreen .vjs-control-bar {
+  height: 120px;
+  padding: 30px;
+}
+
+.vjs-theme-netflix .vjs-video-title {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  z-index: 1001;
+  transition: opacity 0.5s ease; /* Smooth fade transition */
+}
+
+.vjs-theme-netflix .vjs-progress-control {
+  flex: 1;
+  margin: 0 10px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  position: relative;
+  top: 0;
+}
+
+.vjs-theme-netflix .vjs-progress-holder {
+  background: transparent;
+}
+
+.vjs-theme-netflix .vjs-load-progress {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.vjs-theme-netflix .vjs-play-progress {
+  background: var(--vjs-theme-netflix--primary);
+}
+
+.vjs-theme-netflix .vjs-play-progress:before {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--vjs-theme-netflix--primary);
+  border-radius: 50%;
+}
+
+.vjs-theme-netflix .vjs-time-tooltip,
+.vjs-theme-netflix .vjs-progress-control .vjs-mouse-display {
+  background: var(--vjs-theme-netflix--primary);
+  color: white;
+  border-radius: 2px;
+}
+
+.vjs-theme-netflix .vjs-current-time,
+.vjs-theme-netflix .vjs-remaining-time {
+  color: #ffffff;
+  font-size: 14px;
+  margin: 0 10px;
+}
+
+.vjs-theme-netflix .vjs-control-bar .vjs-button {
+  color: var(--vjs-theme-netflix--secondary);
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.vjs-theme-netflix .vjs-control-bar .vjs-button:hover {
+  color: var(--vjs-theme-netflix--primary);
+}
+
+.vjs-theme-netflix .vjs-rewind-button span,
+.vjs-theme-netflix .vjs-forward-button span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vjs-theme-netflix .vjs-volume-panel {
+  margin-right: 10px;
+}
+
+.vjs-theme-netflix .vjs-volume-bar.vjs-slider-vertical {
+  height: 80px;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.vjs-theme-netflix .vjs-volume-level {
+  background: var(--vjs-theme-netflix--primary);
+}
+
+.vjs-theme-netflix .vjs-big-play-button {
+  background: rgba(229, 9, 20, 0.8);
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  line-height: 90px;
+  font-size: 36px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  border: none;
+  z-index: 1000;
+}
+
+.vjs-theme-netflix .vjs-big-play-button:hover {
+  background: #f40612;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Fade in/out behavior */
+.vjs-theme-netflix.vjs-user-inactive .vjs-control-bar,
+.vjs-theme-netflix.vjs-user-inactive .vjs-video-title {
+  opacity: 0;
+  visibility: hidden; /* Ensure it’s not clickable when hidden */
+}
+
+.vjs-theme-netflix.vjs-user-active .vjs-control-bar,
+.vjs-theme-netflix.vjs-user-active .vjs-video-title {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Ensure touch events trigger user activity */
+.video-js .vjs-tech {
+  pointer-events: auto;
+}
+
+.refresh-button {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e50914;
+  color: white;
+  border: none;
+  padding: 12px 24px;
   font-size: 16px;
-  color: #ffb200; /* Highlighted message color */
-  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.refresh-button:hover {
+  background: #f40612;
+  transform: translateX(-50%) scale(1.05);
 }
 
 /* Popup styling */
@@ -95,7 +280,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -103,11 +288,10 @@
   animation: fadeIn 0.5s ease-out;
 }
 
-/* Popup container */
 .popup-container {
-  background: #141414; /* Dark background to match Netflix's theme */
+  background: #181818;
   padding: 40px;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.8);
   max-width: 600px;
   width: 100%;
@@ -116,25 +300,18 @@
   animation: popupIn 0.3s ease-out;
 }
 
-/* Popup Header */
 .popup-container h3 {
   font-size: 26px;
   margin-bottom: 20px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 700;
 }
 
-/* Popup Body Text */
 .popup-container p {
-  color: #f5f5f5;
+  color: #d2d2d2;
   font-size: 18px;
   margin-bottom: 30px;
-  line-height: 1.6;
-  font-weight: 400;
-  letter-spacing: 0.5px;
 }
 
-/* Popup Buttons */
 .popup-buttons {
   display: flex;
   justify-content: space-between;
@@ -142,78 +319,100 @@
 }
 
 .popup-buttons button {
-  background: linear-gradient(135deg, #e50914, #db0707); /* Netflix red gradient */
+  background: #e50914;
   color: white;
   padding: 15px 40px;
   border: none;
   font-size: 18px;
-  font-weight: 600;
-  border-radius: 6px;
+  font-weight: 700;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
-  width: 45%; /* Equal button size */
+  width: 45%;
 }
 
 .popup-buttons button:hover {
-  background: linear-gradient(135deg, #db0707, #e50914);
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  background: #f40612;
 }
 
-.popup-buttons button:active {
-  transform: scale(0.98);
-}
-
-/* Close button styling */
 .close-popup {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #f5f5f5;
-  font-size: 24px;
-  font-weight: bold;
+  top: 15px;
+  right: 15px;
+  color: #d2d2d2;
+  font-size: 28px;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .close-popup:hover {
-  color: #e50914; /* Highlight with Netflix red */
-  transform: rotate(90deg);
+  color: #e50914;
 }
 
-/* Animations for the popup */
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes popupIn {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Loader/Spinner styling (for professional touch) */
 .loader {
-  border: 4px solid #f3f3f3; 
-  border-top: 4px solid #e50914; 
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #e50914;
   border-radius: 50%;
   width: 50px;
   height: 50px;
   animation: spin 1s linear infinite;
+  margin: 20px auto;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes popupIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .video-js {
+    height: 100vw;
+    max-height: 50vh;
+  }
+  
+  .vjs-theme-netflix .vjs-control-bar {
+    height: 80px;
+    padding: 10px;
+  }
+  
+  .vjs-theme-netflix.vjs-fullscreen .vjs-control-bar {
+    height: 100px;
+    padding: 15px;
+  }
+  
+  .vjs-theme-netflix .vjs-button {
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+  }
+  
+  .vjs-theme-netflix .vjs-video-title {
+    font-size: 14px;
+    top: -30px;
+  }
+  
+  .refresh-button {
+    bottom: 110px;
+  }
+  
+  .popup-container {
+    padding: 20px;
+    margin: 10px;
+    max-width: 90vw;
+  }
+  
+  .popup-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
 }
