@@ -36,6 +36,9 @@ const topPicksConfig = {
     { title: "Experience", imgSrc: "https://media.giphy.com/media/nHMViIeeBlhhS/giphy.gif?cid=ecf05e47kvd60lhxmsfx8vevcawse4zly6izxydsl9gatvsb&ep=v1_gifs_search&rid=giphy.gif&ct=g", icon: <FaBriefcase />, route: "/work-experience" },
   ],
   user: [
+    { title: "Inside Out 2", imgSrc: "https://media.giphy.com/media/u7YNeEXgaf42XYwle6/giphy.gif?cid=790b7611yh0stth2ll75281dff6qylkeao66j850vdwscrkv&ep=v1_gifs_search&rid=giphy.gif&ct=g", icon: <FaHandsHelping />, route: "/stream/InsideOut2" },
+    { title: "Arrival", imgSrc: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3pwYnY3dG9jcHA4bGdkNjEzNjh4YTgxd28ydGo5N2RmcjMyanEyNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oriOeYGl5MKFtb2FO/giphy.gif", icon: <FaHandsHelping />, route: "/stream/Arrival" },
+    { title: "Sully", imgSrc: "https://media.giphy.com/media/3o85xkr5i2lUQQXMVa/giphy.gif?cid=ecf05e47nm8gyhvykkeebyxrbrdcvewwwmjtkeq3mphri3cl&ep=v1_gifs_related&rid=giphy.gif&ct=g", icon: <FaHandsHelping />, route: "/stream/Sully" },
     { title: "Anora", imgSrc: "https://media.giphy.com/media/jceZJOi7HHeRh8dgid/giphy.gif?cid=790b7611b1ynt90i0myyqfx1na3zhqm2cpc9o3ekpki0yk96&ep=v1_gifs_search&rid=giphy.gif&ct=g", icon: <FaHandsHelping />, route: "/stream/Anora" },
     { title: "Deadpool 2024", imgSrc: "https://media.giphy.com/media/SwsaIZIvtamH0JtFxj/giphy.gif?cid=790b76118ofpieufh0agtqf5e2saysn8pcaq2rpr7am2g82o&ep=v1_gifs_search&rid=giphy.gif&ct=g", icon: <FaHandsHelping />, route: "/stream/Deadpool" },
     { title: "Music", imgSrc: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGZ5a2tmZnJtamt0OGM3cWIxc3ZydzliYjRrd2xpM2tocGR2aTE2dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/blSTtZehjAZ8I/giphy.gif", route: "/music", icon: <FaMusic /> },
