@@ -32,6 +32,54 @@
   color: #d2d2d2;
 }
 
+/* Season and Episode Selectors */
+.season-selector,
+.episode-selector {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.season-selector label,
+.episode-selector label {
+  font-size: clamp(14px, 3vw, 18px);
+  color: #d2d2d2;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.season-selector select,
+.episode-selector select {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  font-size: clamp(14px, 3vw, 18px);
+  background: #181818;
+  color: white;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  font-family: "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.season-selector select:hover,
+.episode-selector select:hover {
+  border-color: #e50914;
+}
+
+.season-selector select:focus,
+.episode-selector select:focus {
+  outline: none;
+  border-color: #e50914;
+}
+
 .quality-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -213,8 +261,8 @@
   align-items: center;
   justify-content: center;
   transition: color 0.3s ease;
-  z-index: 1001; /* Ensure buttons are above other elements */
-  touch-action: manipulation; /* Improve touch responsiveness */
+  z-index: 1001;
+  touch-action: manipulation;
 }
 
 .vjs-theme-netflix .vjs-control-bar .vjs-button:hover {
@@ -422,14 +470,14 @@
   
   .vjs-theme-netflix .vjs-button {
     font-size: 20px;
-    width: 50px; /* Larger touch area for mobile */
+    width: 50px;
     height: 50px;
     margin: 0 5px;
   }
   
   .vjs-theme-netflix .vjs-rewind-button span,
   .vjs-theme-netflix .vjs-forward-button span {
-    font-size: 12px; /* Slightly smaller text for mobile */
+    font-size: 12px;
   }
   
   .vjs-theme-netflix .vjs-video-title {
@@ -445,6 +493,8 @@
   
   .refresh-button {
     bottom: 110px;
+    padding: 10px 20px;
+    font-size: 14px;
   }
   
   .popup-container {
@@ -456,5 +506,11 @@
   .popup-buttons button {
     padding: 10px 20px;
     font-size: 16px;
+  }
+
+  .season-selector select,
+  .episode-selector select {
+    max-width: 250px;
+    padding: 8px;
   }
 }

@@ -27,10 +27,12 @@ const decryptVideoUrl = (encrypted, key = "xai-stream-key") => {
 };
 
 const Stream = () => {
-  const { videoName } = useParams();
+  const { videoName, season: seasonParam, episode: episodeParam } = useParams(); // Add season and episode params
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const [currentSource, setCurrentSource] = useState(null);
+  const [selectedSeason, setSelectedSeason] = useState(seasonParam || null);
+  const [selectedEpisode, setSelectedEpisode] = useState(episodeParam || null);
   const [isQualitySelected, setIsQualitySelected] = useState(false);
   const [validVideo, setValidVideo] = useState(true);
   const [credits, setCredits] = useState(0);
@@ -40,11 +42,16 @@ const Stream = () => {
   const [lastWatchedTime, setLastWatchedTime] = useState(null);
   const [showPopup, setShowPopup] = useState(null);
   const [showRefresh, setShowRefresh] = useState(false);
+  const [userName, setUserName] = useState(null); // Added to store the user's display name
   const navigate = useNavigate();
   const auth = getAuth();
   const db = getFirestore();
 
   const COST = 4;
+
+  const isSeries = videoSources[videoName]?.type === "series";
+  const seasons = isSeries ? Object.keys(videoSources[videoName].seasons) : [];
+  const episodes = isSeries && selectedSeason ? Object.keys(videoSources[videoName].seasons[selectedSeason].episodes) : [];
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -91,19 +98,21 @@ const Stream = () => {
       } else {
         const userDocRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(userDocRef);
-        
+        const videoKey = isSeries ? `${videoName}-${selectedSeason}` : videoName;
+
         if (docSnap.exists()) {
           const data = docSnap.data();
           const lastUpdatedTimestamp = data.lastUpdated?.toDate();
-          const lastWatchedTimestamp = data.lastWatched?.[videoName]?.toDate();
+          const lastWatchedTimestamp = data.lastWatched?.[videoKey]?.toDate();
           const now = new Date();
           const timeDiff = lastUpdatedTimestamp ? (now - lastUpdatedTimestamp) / 1000 : 0;
           const timeSinceLastWatched = lastWatchedTimestamp ? (now - lastWatchedTimestamp) / 1000 : null;
-          
+
           setCredits(data.credits);
           setLastUpdated(lastUpdatedTimestamp);
           setLastWatchedTime(lastWatchedTimestamp);
           setTimeLeft(timeSinceLastWatched ? 86400 - timeSinceLastWatched : timeDiff < 86400 ? 86400 - timeDiff : 0);
+          setUserName(user.displayName || "user"); // Set userName from Firebase displayName, default to "user"
         } else {
           await setDoc(userDocRef, {
             credits: 10,
@@ -113,12 +122,13 @@ const Stream = () => {
           setCredits(10);
           setLastUpdated(new Date());
           setTimeLeft(0);
+          setUserName(user.displayName || "user"); // Set userName from Firebase displayName, default to "user"
         }
         setLoading(false);
       }
     });
     return () => unsubscribe();
-  }, [auth, db, navigate, videoName]);
+  }, [auth, db, navigate, videoName, selectedSeason]);
 
   const handleQualitySelection = (quality) => {
     const user = auth.currentUser;
@@ -143,11 +153,12 @@ const Stream = () => {
     const user = auth.currentUser;
     if (user && currentSource) {
       const userDocRef = doc(db, "users", user.uid);
+      const videoKey = isSeries ? `${videoName}-${selectedSeason}` : videoName;
       setLoading(true);
       await updateDoc(userDocRef, {
         credits: credits - COST,
         lastUpdated: Timestamp.now(),
-        [`lastWatched.${videoName}`]: Timestamp.now(),
+        [`lastWatched.${videoKey}`]: Timestamp.now(),
       });
 
       setCredits(credits - COST);
@@ -197,73 +208,56 @@ const Stream = () => {
 
         const player = playerRef.current;
 
-        // Add video title above progress bar
+        // Add video/series title
         const titleElement = document.createElement('div');
         titleElement.className = 'vjs-video-title';
-        titleElement.innerText = videoName;
+        titleElement.innerText = isSeries ? `${videoName} - ${selectedSeason} ${selectedEpisode}` : videoName;
         player.el().insertBefore(titleElement, player.controlBar.el());
 
-        // Add back button in top-left corner
+        // Add back button - Updated to navigate to "/profile/[userName]"
         const backButton = document.createElement('button');
         backButton.className = 'vjs-back-button';
         backButton.innerHTML = '<span>← Back</span>';
-        backButton.onclick = () => navigate(-1);
+        backButton.onclick = () => navigate(`/profile/${userName || "user"}`); // Navigate to /profile/[userName]
         player.el().appendChild(backButton);
 
-        // Add rewind button manually
+        // Add rewind and forward buttons
         const rewindButton = player.controlBar.addChild('Button', {
           className: 'vjs-rewind-button',
           controlText: 'Rewind 10s'
         });
         rewindButton.el().innerHTML = '<span>-10</span>';
-        const handleRewind = () => {
-          const currentTime = player.currentTime();
-          player.currentTime(Math.max(0, currentTime - 10));
-        };
+        const handleRewind = () => player.currentTime(Math.max(0, player.currentTime() - 10));
         rewindButton.on('click', handleRewind);
-        // Add touch event for mobile
         rewindButton.el().addEventListener('touchstart', (e) => {
           e.preventDefault();
           handleRewind();
         });
         player.controlBar.el().insertBefore(rewindButton.el(), player.controlBar.getChild('volumePanel').el());
 
-        // Add forward button manually
         const forwardButton = player.controlBar.addChild('Button', {
           className: 'vjs-forward-button',
           controlText: 'Forward 10s'
         });
         forwardButton.el().innerHTML = '<span>+10</span>';
-        const handleForward = () => {
-          const currentTime = player.currentTime();
-          const duration = player.duration();
-          player.currentTime(Math.min(duration, currentTime + 10));
-        };
+        const handleForward = () => player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
         forwardButton.on('click', handleForward);
-        // Add touch event for mobile
         forwardButton.el().addEventListener('touchstart', (e) => {
           e.preventDefault();
           handleForward();
         });
         player.controlBar.el().insertBefore(forwardButton.el(), player.controlBar.getChild('fullscreenToggle').el());
 
-        // Prevent right-click
-        player.el().addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-        });
+        player.el().addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // Touch controls (only for play/pause toggle)
         const videoEl = player.el().querySelector('.vjs-tech');
         let tapTimer;
         videoEl.addEventListener('touchend', (e) => {
           e.preventDefault();
           clearTimeout(tapTimer);
           tapTimer = setTimeout(() => {
-            if (player.paused()) {
-              player.play();
-            } else {
-              player.pause();
-            }
+            if (player.paused()) player.play();
+            else player.pause();
           }, 200);
         });
 
@@ -276,14 +270,17 @@ const Stream = () => {
           setShowRefresh(false);
         });
       }
-      
-      const encryptedUrl = encryptVideoUrl(videoSources[videoName][currentSource]);
+
+      const videoUrl = isSeries
+        ? videoSources[videoName].seasons[selectedSeason].episodes[selectedEpisode][currentSource]
+        : videoSources[videoName][currentSource];
+      const encryptedUrl = encryptVideoUrl(videoUrl);
       playerRef.current.src([{ src: decryptVideoUrl(encryptedUrl), type: "video/mp4" }]);
       playerRef.current.play().catch(() => {
         errorTimer = setTimeout(() => setShowRefresh(true), 10000);
       });
     }
-    
+
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose();
@@ -291,14 +288,12 @@ const Stream = () => {
       }
       clearTimeout(errorTimer);
     };
-  }, [validVideo, currentSource, isQualitySelected, videoName, navigate]);
+  }, [validVideo, currentSource, isQualitySelected, videoName, selectedSeason, selectedEpisode, navigate, userName]); // Added userName to dependencies
 
   useEffect(() => {
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i')) {
-        e.preventDefault();
-      }
+      if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'i')) e.preventDefault();
     });
   }, []);
 
@@ -310,18 +305,72 @@ const Stream = () => {
       {!isQualitySelected ? (
         <div className="intro-screen">
           <h2>{videoName}</h2>
-          {lastWatchedTime && timeLeft > 0 ? (
-            <p>Continue watching without Re-purchase for next {Math.floor(timeLeft / 3600)} hours.</p>
+          {isSeries ? (
+            <>
+              <div className="season-selector">
+                <label>Select Season:</label>
+                <select
+                  value={selectedSeason || ""}
+                  onChange={(e) => {
+                    setSelectedSeason(e.target.value);
+                    setSelectedEpisode(null); // Reset episode when season changes
+                    navigate(`/stream/${videoName}/${e.target.value}`);
+                  }}
+                >
+                  <option value="" disabled>Select a season</option>
+                  {seasons.map((season) => (
+                    <option key={season} value={season}>{season}</option>
+                  ))}
+                </select>
+              </div>
+              {selectedSeason && (
+                <div className="episode-selector">
+                  <label>Select Episode:</label>
+                  <select
+                    value={selectedEpisode || ""}
+                    onChange={(e) => {
+                      setSelectedEpisode(e.target.value);
+                      navigate(`/stream/${videoName}/${selectedSeason}/${e.target.value}`);
+                    }}
+                  >
+                    <option value="" disabled>Select an episode</option>
+                    {episodes.map((episode) => (
+                      <option key={episode} value={episode}>{episode}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {selectedSeason && selectedEpisode && (
+                <>
+                  {lastWatchedTime && timeLeft > 0 ? (
+                    <p>Continue watching this season without Re-purchase for next {Math.floor(timeLeft / 3600)} hours.</p>
+                  ) : (
+                    <p>This season costs {COST} credits to watch.</p>
+                  )}
+                  <p>Your current credits: {credits}</p>
+                  <div className="quality-buttons">
+                    <button onClick={() => handleQualitySelection("1080p")}>1080p</button>
+                    <button onClick={() => handleQualitySelection("720p")}>720p</button>
+                    <button onClick={() => handleQualitySelection("480p")}>480p</button>
+                  </div>
+                </>
+              )}
+            </>
           ) : (
-            <p>This movie costs {COST} credits to watch.</p>
+            <>
+              {lastWatchedTime && timeLeft > 0 ? (
+                <p>Continue watching without Re-purchase for next {Math.floor(timeLeft / 3600)} hours.</p>
+              ) : (
+                <p>This movie costs {COST} credits to watch.</p>
+              )}
+              <p>Your current credits: {credits}</p>
+              <div className="quality-buttons">
+                <button onClick={() => handleQualitySelection("1080p")}>1080p</button>
+                <button onClick={() => handleQualitySelection("720p")}>720p</button>
+                <button onClick={() => handleQualitySelection("480p")}>480p</button>
+              </div>
+            </>
           )}
-          <p>Your current credits: {credits}</p>
-          
-          <div className="quality-buttons">
-            <button onClick={() => handleQualitySelection("1080p")}>1080p</button>
-            <button onClick={() => handleQualitySelection("720p")}>720p</button>
-            <button onClick={() => handleQualitySelection("480p")}>480p</button>
-          </div>
         </div>
       ) : (
         <div className="video-container">
@@ -342,7 +391,7 @@ const Stream = () => {
             {showPopup === "purchase" && (
               <>
                 <h3>Confirm Purchase</h3>
-                <p>Are you sure you want to purchase this movie for {COST} credits?</p>
+                <p>Are you sure you want to purchase this {isSeries ? "season" : "movie"} for {COST} credits?</p>
                 <div className="popup-buttons">
                   <button onClick={handlePurchase}>Yes</button>
                   <button onClick={() => setShowPopup(null)}>No</button>
@@ -352,7 +401,7 @@ const Stream = () => {
             {showPopup === "credits" && (
               <>
                 <h3>Insufficient Credits</h3>
-                <p>You need {COST} credits to watch this video. Please wait for auto renewal.</p>
+                <p>You need {COST} credits to watch this {isSeries ? "season" : "movie"}. Please wait for auto renewal.</p>
                 <div className="popup-buttons">
                   <button onClick={() => setShowPopup(null)}>OK</button>
                 </div>
