@@ -173,7 +173,7 @@ const Stream = () => {
           preload: "auto",
           fluid: true,
           responsive: true,
-          inactivityTimeout: 5000, // Set timeout to 5 seconds
+          inactivityTimeout: 5000,
           controlBar: {
             volumePanel: { inline: false, vertical: true },
             pictureInPictureToggle: false,
@@ -233,33 +233,69 @@ const Stream = () => {
           e.preventDefault();
         });
 
-        // Touch controls
+        // Touch controls with refined seek areas
         const videoEl = player.el().querySelector('.vjs-tech');
         videoEl.addEventListener('touchstart', (e) => {
           e.preventDefault();
           const touch = e.touches[0];
           const rect = videoEl.getBoundingClientRect();
           const touchX = touch.clientX - rect.left;
-          const halfWidth = rect.width / 2;
+          const touchY = touch.clientY - rect.top;
+          const width = rect.width;
+          const height = rect.height;
 
-          if (touchX < halfWidth) {
-            player.currentTime(Math.max(0, player.currentTime() - 10));
-          } else {
-            player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
+          // Define seek zones: 20% of width on each side, 50% of height in the middle
+          const seekZoneWidth = width * 0.2; // 20% of screen width for each seek zone
+          const seekZoneHeight = height * 0.5; // 50% of screen height for seek zone
+          const seekZoneTop = (height - seekZoneHeight) / 2; // Center vertically
+          const seekZoneBottom = seekZoneTop + seekZoneHeight;
+
+          // Check if touch is within vertical seek zone
+          const isInVerticalZone = touchY >= seekZoneTop && touchY <= seekZoneBottom;
+
+          if (isInVerticalZone) {
+            // Left seek zone (rewind)
+            if (touchX < seekZoneWidth) {
+              player.currentTime(Math.max(0, player.currentTime() - 10));
+              return;
+            }
+            // Right seek zone (forward)
+            if (touchX > width - seekZoneWidth) {
+              player.currentTime(Math.min(player.duration(), player.currentTime() + 10));
+              return;
+            }
           }
         });
 
         let tapTimer;
         videoEl.addEventListener('touchend', (e) => {
           e.preventDefault();
-          clearTimeout(tapTimer);
-          tapTimer = setTimeout(() => {
-            if (player.paused()) {
-              player.play();
-            } else {
-              player.pause();
-            }
-          }, 200);
+          const touch = e.changedTouches[0];
+          const rect = videoEl.getBoundingClientRect();
+          const touchX = touch.clientX - rect.left;
+          const touchY = touch.clientY - rect.top;
+          const width = rect.width;
+          const height = rect.height;
+
+          // Define seek zones again to exclude them from pause/play toggle
+          const seekZoneWidth = width * 0.2;
+          const seekZoneHeight = height * 0.5;
+          const seekZoneTop = (height - seekZoneHeight) / 2;
+          const seekZoneBottom = seekZoneTop + seekZoneHeight;
+          const isInVerticalZone = touchY >= seekZoneTop && touchY <= seekZoneBottom;
+          const isInSeekZone = (touchX < seekZoneWidth || touchX > width - seekZoneWidth) && isInVerticalZone;
+
+          if (!isInSeekZone) {
+            // Only toggle play/pause if touch is outside seek zones
+            clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => {
+              if (player.paused()) {
+                player.play();
+              } else {
+                player.pause();
+              }
+            }, 200);
+          }
         });
 
         player.on('error', () => {
