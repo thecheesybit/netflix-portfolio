@@ -207,7 +207,7 @@ const Stream = () => {
         const backButton = document.createElement('button');
         backButton.className = 'vjs-back-button';
         backButton.innerHTML = '<span>← Back</span>';
-        backButton.onclick = () => navigate(-1); // Navigate back
+        backButton.onclick = () => navigate(-1);
         player.el().appendChild(backButton);
 
         // Add rewind button manually
@@ -216,9 +216,15 @@ const Stream = () => {
           controlText: 'Rewind 10s'
         });
         rewindButton.el().innerHTML = '<span>-10</span>';
-        rewindButton.on('click', () => {
+        const handleRewind = () => {
           const currentTime = player.currentTime();
           player.currentTime(Math.max(0, currentTime - 10));
+        };
+        rewindButton.on('click', handleRewind);
+        // Add touch event for mobile
+        rewindButton.el().addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleRewind();
         });
         player.controlBar.el().insertBefore(rewindButton.el(), player.controlBar.getChild('volumePanel').el());
 
@@ -228,10 +234,16 @@ const Stream = () => {
           controlText: 'Forward 10s'
         });
         forwardButton.el().innerHTML = '<span>+10</span>';
-        forwardButton.on('click', () => {
+        const handleForward = () => {
           const currentTime = player.currentTime();
           const duration = player.duration();
           player.currentTime(Math.min(duration, currentTime + 10));
+        };
+        forwardButton.on('click', handleForward);
+        // Add touch event for mobile
+        forwardButton.el().addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleForward();
         });
         player.controlBar.el().insertBefore(forwardButton.el(), player.controlBar.getChild('fullscreenToggle').el());
 

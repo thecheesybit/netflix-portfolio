@@ -213,6 +213,8 @@
   align-items: center;
   justify-content: center;
   transition: color 0.3s ease;
+  z-index: 1001; /* Ensure buttons are above other elements */
+  touch-action: manipulation; /* Improve touch responsiveness */
 }
 
 .vjs-theme-netflix .vjs-control-bar .vjs-button:hover {
@@ -420,8 +422,14 @@
   
   .vjs-theme-netflix .vjs-button {
     font-size: 20px;
-    width: 35px;
-    height: 35px;
+    width: 50px; /* Larger touch area for mobile */
+    height: 50px;
+    margin: 0 5px;
+  }
+  
+  .vjs-theme-netflix .vjs-rewind-button span,
+  .vjs-theme-netflix .vjs-forward-button span {
+    font-size: 12px; /* Slightly smaller text for mobile */
   }
   
   .vjs-theme-netflix .vjs-video-title {
@@ -444,7 +452,6 @@
     margin: 10px;
     max-width: 90vw;
   }
-  
   
   .popup-buttons button {
     padding: 10px 20px;
