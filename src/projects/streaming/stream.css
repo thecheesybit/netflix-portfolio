@@ -104,7 +104,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  transition: opacity 0.5s ease; /* Smooth fade transition */
+  transition: opacity 0.5s ease;
   z-index: 1000;
   position: absolute;
   bottom: 0;
@@ -126,7 +126,33 @@
   font-weight: 500;
   font-family: "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   z-index: 1001;
-  transition: opacity 0.5s ease; /* Smooth fade transition */
+  transition: opacity 0.5s ease;
+}
+
+/* Back button styling */
+.vjs-theme-netflix .vjs-back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Netflix Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  cursor: pointer;
+  z-index: 1001;
+  transition: opacity 0.5s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.vjs-theme-netflix .vjs-back-button:hover {
+  color: var(--vjs-theme-netflix--primary);
+}
+
+.vjs-theme-netflix .vjs-back-button span {
+  margin-left: 5px;
 }
 
 .vjs-theme-netflix .vjs-progress-control {
@@ -236,13 +262,15 @@
 
 /* Fade in/out behavior */
 .vjs-theme-netflix.vjs-user-inactive .vjs-control-bar,
-.vjs-theme-netflix.vjs-user-inactive .vjs-video-title {
+.vjs-theme-netflix.vjs-user-inactive .vjs-video-title,
+.vjs-theme-netflix.vjs-user-inactive .vjs-back-button {
   opacity: 0;
-  visibility: hidden; /* Ensure it’s not clickable when hidden */
+  visibility: hidden;
 }
 
 .vjs-theme-netflix.vjs-user-active .vjs-control-bar,
-.vjs-theme-netflix.vjs-user-active .vjs-video-title {
+.vjs-theme-netflix.vjs-user-active .vjs-video-title,
+.vjs-theme-netflix.vjs-user-active .vjs-back-button {
   opacity: 1;
   visibility: visible;
 }
@@ -400,6 +428,12 @@
     font-size: 14px;
     top: -30px;
   }
+
+  .vjs-theme-netflix .vjs-back-button {
+    top: 10px;
+    left: 10px;
+    font-size: 14px;
+  }
   
   .refresh-button {
     bottom: 110px;
@@ -410,6 +444,7 @@
     margin: 10px;
     max-width: 90vw;
   }
+  
   
   .popup-buttons button {
     padding: 10px 20px;
