@@ -36,7 +36,7 @@ const Stream = () => {
   const [isQualitySelected, setIsQualitySelected] = useState(false);
   const [validVideo, setValidVideo] = useState(true);
   const [credits, setCredits] = useState(0);
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [, setLastUpdated] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastWatchedTime, setLastWatchedTime] = useState(null);
@@ -47,7 +47,7 @@ const Stream = () => {
   const auth = getAuth();
   const db = getFirestore();
 
-  const COST = 4;
+  const COST = 3;
 
   const isSeries = videoSources[videoName]?.type === "series";
   const seasons = isSeries ? Object.keys(videoSources[videoName].seasons) : [];
@@ -115,11 +115,11 @@ const Stream = () => {
           setUserName(user.displayName || "user"); // Set userName from Firebase displayName, default to "user"
         } else {
           await setDoc(userDocRef, {
-            credits: 10,
+            credits: 20,    // Sets credits to 20 
             lastUpdated: Timestamp.now(),
             lastWatched: {},
           });
-          setCredits(10);
+          setCredits(20);
           setLastUpdated(new Date());
           setTimeLeft(0);
           setUserName(user.displayName || "user"); // Set userName from Firebase displayName, default to "user"
@@ -128,6 +128,7 @@ const Stream = () => {
       }
     });
     return () => unsubscribe();
+    // eslint-disable-next-line
   }, [auth, db, navigate, videoName, selectedSeason]);
 
   const handleQualitySelection = (quality) => {
@@ -288,6 +289,7 @@ const Stream = () => {
       }
       clearTimeout(errorTimer);
     };
+    // eslint-disable-next-line
   }, [validVideo, currentSource, isQualitySelected, videoName, selectedSeason, selectedEpisode, navigate, userName]); // Added userName to dependencies
 
   useEffect(() => {
@@ -297,7 +299,7 @@ const Stream = () => {
     });
   }, []);
 
-  if (loading) return <div className="loader">Loading...</div>;
+  if (loading) return <div className="loader"></div>;
   if (!validVideo) return <div>Video not found!</div>;
 
   return (

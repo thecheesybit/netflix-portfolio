@@ -11,13 +11,13 @@ interface ContinueWatchingProps {
 
 const continueWatchingConfig = {
   recruiter: [
-    { title: "Music", imgSrc: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGZ5a2tmZnJtamt0OGM3cWIxc3ZydzliYjRrd2xpM2tocGR2aTE2dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/blSTtZehjAZ8I/giphy.gif", link: "/music" },
+    { title: "Music", imgSrc: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHx8MHx8fDA%3D", link: "/music" },
     { title: "Reading", imgSrc: "https://media.giphy.com/media/VgY4dDdN1W3NS/giphy.gif?cid=790b7611y7dak6cc5mwv8bc50dr814mo5obry6aqu7h72ptp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/reading" },
     { title: "Blogs", imgSrc: "https://media.giphy.com/media/10LziGOBkifXzO/giphy.gif?cid=790b7611bc1rl1wbji44jkjz1itf2yankgmam5nxsgl7hitr&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/blogs" },
     
   ],
   developer: [
-    { title: "Music", imgSrc: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGZ5a2tmZnJtamt0OGM3cWIxc3ZydzliYjRrd2xpM2tocGR2aTE2dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/blSTtZehjAZ8I/giphy.gif", link: "/music" },
+    { title: "Music", imgSrc: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHx8MHx8fDA%3D", link: "/music" },
     { title: "Reading", imgSrc: "https://media.giphy.com/media/VgY4dDdN1W3NS/giphy.gif?cid=790b7611y7dak6cc5mwv8bc50dr814mo5obry6aqu7h72ptp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/reading" },
     { title: "Certifications", imgSrc: "https://media.giphy.com/media/bAztItaKZWFLrj04LT/giphy.gif?cid=790b7611611vwatgghj7g4nxvjis7qk3eb9x5cn1oepau7n6&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/certifications" },
     { title: "Contact Me", imgSrc: "https://media.giphy.com/media/oC5V6VFUiwPjjMN4Xe/giphy.gif?cid=790b7611j0ld3dkipe4h4ydnyoj5ozy7um1s85s6cq9gbcpp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/contact-me" }
@@ -28,12 +28,8 @@ const continueWatchingConfig = {
     { title: "Contact Me", imgSrc: "https://media.giphy.com/media/oC5V6VFUiwPjjMN4Xe/giphy.gif?cid=790b7611j0ld3dkipe4h4ydnyoj5ozy7um1s85s6cq9gbcpp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/contact-me" }
   ],
   user: [
-    
     { title: "Reading", imgSrc: "https://media.giphy.com/media/VgY4dDdN1W3NS/giphy.gif?cid=790b7611y7dak6cc5mwv8bc50dr814mo5obry6aqu7h72ptp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/reading" },
     { title: "Contact Me", imgSrc: "https://media.giphy.com/media/oC5V6VFUiwPjjMN4Xe/giphy.gif?cid=790b7611j0ld3dkipe4h4ydnyoj5ozy7um1s85s6cq9gbcpp&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/contact-me" },
-    { title: "Dune 2", imgSrc: "https://media.giphy.com/media/VhQ6lcE0qyRYI88bI6/giphy.gif?cid=790b76116y0itlz4muxgrekrv3w4mxsszdyn65kgxv0u10vo&ep=v1_gifs_search&rid=giphy.gif&ct=g", link: "/stream/Dune2" },
-    { title: "Kraven", imgSrc: "https://media.giphy.com/media/tPmrSLGv6IvUCtSKto/giphy.gif?cid=ecf05e47mxiqaufkqnssigdu64ly295zt49zgrmngm1h2t9i&ep=v1_gifs_related&rid=giphy.gif&ct=g", link: "/stream/Kraven" },
-    { title: "Alien Romulus", imgSrc: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNiOXk2MnFjOWl2Z2RqYzRxajZxNDVtbGlvM2JoN2FhcmxmcTBtcCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hF4jNsNkYVSAwNqszv/giphy.gif", link: "/stream/AlienRomulus" },
   ]
 };
 

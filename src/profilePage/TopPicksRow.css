@@ -1,36 +1,48 @@
 .top-picks-row {
-  margin: 20px 0;
-  padding: 10px 20px
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.top-picks-row::-webkit-scrollbar {
+  display: none;
+}
+.top-picks-row {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .row-title {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   color: #fff;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   animation: fadeIn 1s ease-in-out;
 }
 
 .card-row {
   display: flex;
-  gap: 15px;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
 }
 
 .pick-card {
   position: relative;
-  width: 250px;
-  height: 200px;
-  border-radius: 8px;
+  width: clamp(150px, 40vw, 250px); /* Exact match with movies-row */
+  height: clamp(120px, 32vw, 200px); /* Exact match with movies-row */
+  border-radius: 8px; /* Match movies-row */
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: slideIn 0.5s ease forwards;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
-.pick-card:hover {
+.pick-card:active {
   transform: scale(1.05);
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.5); /* Netflix red glow on hover */
+  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.5);
 }
 
 .pick-image {
@@ -40,7 +52,7 @@
   transition: transform 0.3s ease;
 }
 
-.pick-card:hover .pick-image {
+.pick-card:active .pick-image {
   transform: scale(1.1);
 }
 
@@ -58,26 +70,26 @@
   transition: opacity 0.3s ease;
 }
 
-.pick-card:hover .overlay {
+.pick-card:active .overlay {
   opacity: 1;
 }
 
 .pick-label {
   color: #fff;
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 3vw, 1.2rem); /* Match movies-row */
   font-weight: bold;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.pick-label:hover {
- color: rgb(153, 80, 80);
+.pick-label:active {
+  color: rgb(153, 80, 80);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-1rem);
   }
   to {
     opacity: 1;
@@ -88,10 +100,47 @@
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-1rem);
   }
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .top-picks-row {
+    margin: 20px 0;
+    padding: 10px 20px;
+    overflow-x: visible;
+  }
+
+  .card-row {
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .pick-card {
+    width: 250px; /* Exact match with movies-row */
+    height: 200px; /* Exact match with movies-row */
+  }
+
+  .pick-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255, 0, 0, 0.5);
+  }
+
+  .pick-card:hover .pick-image {
+    transform: scale(1.1);
+  }
+
+  .pick-card:hover .overlay {
+    opacity: 1;
+  }
+
+  .pick-label:hover {
+    color: rgb(153, 80, 80);
   }
 }

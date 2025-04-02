@@ -6,6 +6,7 @@ import ProfileBanner from './ProfileBanner';
 import TopPicksRow from './TopPicksRow';
 import ContinueWatching from './ContinueWatching';
 import SeriesRow from './SeriesRow';
+import MoviesRow from './MoviesRow';
 
 type ProfileType = 'recruiter' | 'developer' | 'stalker' | 'user';
 
@@ -28,6 +29,7 @@ const ProfilePage: React.FC = () => {
       </div>
       <TopPicksRow profile={profile} />
       <ContinueWatching profile={profile} />
+      <MoviesRow profile={profile} />
       <SeriesRow profile={profile} />
 
       {/* Footer with Disclaimer */}

@@ -1,0 +1,149 @@
+.movies-row {
+  margin: 1rem 0; /* Reduced margin for mobile, using rem for scalability */
+  padding: 0.5rem 1rem; /* Adjusted padding */
+  overflow-x: auto; /* Enable horizontal scrolling for mobile */
+  white-space: nowrap; /* Prevent wrapping on small screens */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Hide scrollbar for a cleaner look on mobile */
+.movies-row::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+.movies-row {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.row-title {
+  font-size: clamp(1.5rem, 5vw, 2rem); /* Scales between 1.5rem and 2rem based on viewport width */
+  color: #fff;
+  margin-bottom: 1rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.card-row {
+  display: flex;
+  gap: 0.75rem; /* Reduced gap for mobile */
+  flex-wrap: nowrap; /* Ensure horizontal layout */
+}
+
+.movies-card {
+  position: relative;
+  width: clamp(150px, 40vw, 250px); /* Scales between 150px and 250px */
+  height: clamp(120px, 32vw, 200px); /* Proportional height */
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: slideIn 0.5s ease forwards;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0; /* Prevent cards from shrinking in flex container */
+}
+
+/* Replace hover with active state for touch devices */
+.movies-card:active {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(229, 9, 20, 0.5); /* Netflix red glow on tap */
+}
+
+.movies-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.movies-card:active .movies-image {
+  transform: scale(1.1);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.movies-card:active .overlay {
+  opacity: 1;
+}
+
+.movies-label {
+  color: #fff;
+  font-size: clamp(0.9rem, 3vw, 1.2rem); /* Scales text size */
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.movies-label:active {
+  color: #e50914; /* Netflix red on tap */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem); /* Reduced for mobile */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-1rem); /* Reduced for mobile */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Media Queries for Desktop */
+@media (min-width: 768px) {
+  .movies-row {
+    margin: 20px 0;
+    padding: 10px 20px;
+    overflow-x: visible; /* Disable scrolling on desktop */
+  }
+
+  .card-row {
+    gap: 15px;
+    flex-wrap: wrap; /* Allow wrapping on desktop */
+    justify-content: flex-start;
+  }
+
+  .movies-card {
+    width: 250px;
+    height: 200px;
+  }
+
+  /* Restore hover effects for desktop */
+  .movies-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(229, 9, 20, 0.5);
+  }
+
+  .movies-card:hover .movies-image {
+    transform: scale(1.1);
+  }
+
+  .movies-card:hover .overlay {
+    opacity: 1;
+  }
+
+  .movies-label:hover {
+    color: #e50914;
+  }
+}
